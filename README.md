@@ -76,6 +76,7 @@ cd Germline_Variants/
 ```
 # Download raw sequencing data
 fastq-dump --split-files -X 100000 SRR1972917
+fastq-dump --split-files -X 100000 SRR1972918
 ```
 
 ---
@@ -96,13 +97,21 @@ fastqc *.fastq -o qc/
 # Download adapter file and trim sequences
 curl -OL https://raw.githubusercontent.com/BioInfoTools/BBMap/master/resources/adapters.fa > adapters.fa
 trimmomatic PE SRR1972917_1.fastq SRR1972917_2.fastq \
-    trimmed_1.fastq unpaired_1.fastq \
-    trimmed_2.fastq unpaired_2.fastq \
+    SRR1972917_trimmed_1.fastq SRR1972917_unpaired_1.fastq \
+    SRR1972917_trimmed_2.fastq SRR1972917_unpaired_2.fastq \
     ILLUMINACLIP:adapters.fa:2:30:10 LEADING:20 TRAILING:20 AVGQUAL:20 MINLEN:20
 ```
+
+```
+trimmomatic PE SRR1972918_1.fastq SRR1972918_2.fastq \
+    SRR1972918_trimmed_1.fastq SRR1972918_unpaired_1.fastq \
+    SRR1972918_trimmed_2.fastq SRR1972918_unpaired_2.fastq \
+    ILLUMINACLIP:adapters.fa:2:30:10 LEADING:20 TRAILING:20 AVGQUAL:20 MINLEN:20
+```
+
 ```
 mkdir qc_trimmed
-fastqc trimmed_*.fastq -o qc_trimmed/
+fastqc *trimmed_*.fastq -o qc_trimmed/
 ```
 
 
@@ -117,7 +126,11 @@ fastqc trimmed_*.fastq -o qc_trimmed/
   
 ```
 bwa mem -R '@RG\tID:SRR1972917\tSM:SRR1972917\tPL:ILLUMINA\tLB:SRR1972917' \
-    /home/bqhs/ebola/AF086833.fa trimmed_1.fastq trimmed_2.fastq > SRR1972917_raw.sam
+    /home/bqhs/ebola/AF086833.fa SRR1972917_trimmed_1.fastq SRR1972917_trimmed_2.fastq > SRR1972917_raw.sam
+```
+```
+bwa mem -R '@RG\tID:SRR1972918\tSM:SRR1972918\tPL:ILLUMINA\tLB:SRR1972918' \
+    /home/bqhs/ebola/AF086833.fa SRR1972918_trimmed_1.fastq SRR1972918_trimmed_2.fastq > SRR1972918_raw.sam
 ```
 
 ---
@@ -131,6 +144,9 @@ bwa mem -R '@RG\tID:SRR1972917\tSM:SRR1972917\tPL:ILLUMINA\tLB:SRR1972917' \
 
 ```
 samtools sort SRR1972917_raw.sam > SRR1972917_sort.bam
+```
+```
+samtools sort SRR1972918_raw.sam > SRR1972918_sort.bam
 ```
 
 ---
@@ -147,6 +163,11 @@ picard MarkDuplicates -Xmx50g I=SRR1972917_sort.bam O=SRR1972917_dedup.bam M=SRR
 picard CollectAlignmentSummaryMetrics -Xmx50g INPUT=SRR1972917_dedup.bam OUTPUT=SRR1972917_aln_metrics.txt REFERENCE_SEQUENCE=/home/bqhs/ebola/AF086833.fa
 samtools flagstat SRR1972917_dedup.bam
 ```
+```
+picard MarkDuplicates -Xmx50g I=SRR1972918_sort.bam O=SRR1972918_dedup.bam M=SRR1972918_dedup.txt
+picard CollectAlignmentSummaryMetrics -Xmx50g INPUT=SRR1972918_dedup.bam OUTPUT=SRR1972918_aln_metrics.txt REFERENCE_SEQUENCE=/home/bqhs/ebola/AF086833.fa
+samtools flagstat SRR1972918_dedup.bam
+```
 
 ---
 
@@ -159,6 +180,7 @@ samtools flagstat SRR1972917_dedup.bam
 
 ```
 samtools index SRR1972917_dedup.bam
+samtools index SRR1972918_dedup.bam
 ```
 
 ---
