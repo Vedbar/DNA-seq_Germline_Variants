@@ -151,6 +151,7 @@ samtools flagstat SRR1972917_dedup.bam
 ---
 
 ## 7. Index BAM file
+
 ### Run samtools index
 - Input: Deduplicated BAM file.
 - Output: Indexed BAM file.
