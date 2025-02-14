@@ -54,6 +54,7 @@ conda config --add channels conda-forge
 # conda install mamba
 # mamba install sra-tools fastqc trimmomatic multiqc curl 
 # mamba install bwa samtools picard gatk4
+# mamba install snpeff snpsift
 ```
 
 ---
@@ -263,6 +264,14 @@ gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -
 ## 12. Genotype Concordance
 ### Run GATK GenotypeConcordance
 - Evaluates the accuracy of genotype calls by comparing them to known truth datasets.
+### When Should You Run Genotype Concordance?
+- If you have a known truth dataset (e.g., HapMap, GIAB) and want to evaluate accuracy.
+- If you're comparing different variant calling methods or different filtering strategies.
+- If you need to ensure consistency in genotyping across samples or sequencing batches
+  + Useful in clinical and forensic applications where accurate genotyping is critical.
+### When is Genotype Concordance Not Needed?
+- If you are working with de novo variant calls and don't have a truth set for comparison.
+- If your dataset lacks matched ground truth genotypes.
 
 ```
 gatk GenotypeConcordance -CV combined.filter2.vcf -TV /home/bqhs/ebola/ebola-samples.vcf -O SRR1972917.concordance.grp -CS SRR1972917 -TS SRR1972917
@@ -276,7 +285,7 @@ gatk GenotypeConcordance -CV combined.filter2.vcf -TV /home/bqhs/ebola/ebola-sam
 - SnpEff annotates variants with functional information, including their impact on genes.
 
 ```
-mamba install snpeff snpsift
+# mamba install snpeff snpsift
 snpEff ann AF086833 -v -c /home/vedbar/miniconda3/share/snpeff-5.0-0/snpEff.config -s snpeff.html combined.filter2.vcf > combined.ann.vcf
 ```
 
