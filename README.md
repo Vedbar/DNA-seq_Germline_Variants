@@ -52,61 +52,154 @@ conda config --add channels conda-forge
 ### Installing software
 ```bash
 # conda install mamba
-# mamba install sra-tools fastqc trimmomatic multiqc curl spades quast
-mamba install bwa samtools picard gatk4
+# mamba install sra-tools fastqc trimmomatic multiqc curl 
+# mamba install bwa samtools picard gatk4
 ```
 
 ---
 
 ## 2. Genomic Sequencing Data
 
+### Dataset Information
+- The sequencing data can be retrieved from publicly available datasets:
+- The identifiers SRR1972917 and SRR1972918 correspond to sequencing runs from a study on the 2014 Ebola virus outbreak in Sierra Leone. These runs are part of the BioProject PRJNA257197 and were sequenced using the Illumina HiSeq 2500 platform. The data consists of 101 base pair paired-end reads obtained from patient blood samples through metagenomic RNA sequencing approaches. The resulting sequences belong to the SL3 clade of the Makona variant of Zaire ebolavirus.
+- Study on the 2014 Ebola virus outbreak in Sierra Leone (PMC4503805)(https://pmc.ncbi.nlm.nih.gov/articles/PMC4503805/)
+- **SRA ID:** [SRR1972917](https://www-ncbi-nlm-nih-gov.eres.library.manoa.hawaii.edu/sra/?term=SRR1972917)
+- **SRA ID:** [SRR1972918](https://www-ncbi-nlm-nih-gov.eres.library.manoa.hawaii.edu/sra/?term=SRR1972918)
+- We’ll only use 100k reads
+- Use `fastq-dump` to download paired-end reads:
+
+```
+mkdir Germline_Variants
+cd Germline_Variants/
+# Download raw sequencing data
+fastq-dump --split-files -X 100000 SRR1972917
+```
+
 ---
 
 ## 3. QC raw reads
+
+```
+mkdir qc
+fastqc *.fastq -o qc/
+
+# Download adapter file and trim sequences
+curl -OL https://raw.githubusercontent.com/BioInfoTools/BBMap/master/resources/adapters.fa > adapters.fa
+trimmomatic PE SRR1972917_1.fastq SRR1972917_2.fastq \
+    trimmed_1.fastq unpaired_1.fastq \
+    trimmed_2.fastq unpaired_2.fastq \
+    ILLUMINACLIP:adapters.fa:2:30:10 LEADING:20 TRAILING:20 AVGQUAL:20 MINLEN:20
+
+mkdir qc_trimmed
+fastqc trimmed_*.fastq -o qc_trimmed/
+```
+
 
 ---
 
 ## 5. Align reads
 
+```
+bwa mem -R '@RG\tID:SRR1972917\tSM:SRR1972917\tPL:ILLUMINA\tLB:SRR1972917' \
+    /home/bqhs/ebola/AF086833.fa trimmed_1.fastq trimmed_2.fastq > SRR1972917_raw.sam
+```
+
 ---
 
 ## 6. Sort alignment
+
+```
+samtools sort SRR1972917_raw.sam > SRR1972917_sort.bam
+```
 
 ---
 
 ## 7. Mark duplicates
 
+```
+picard MarkDuplicates -Xmx50g I=SRR1972917_sort.bam O=SRR1972917_dedup.bam M=SRR1972917_dedup.txt
+picard CollectAlignmentSummaryMetrics -Xmx50g INPUT=SRR1972917_dedup.bam OUTPUT=SRR1972917_aln_metrics.txt REFERENCE_SEQUENCE=/home/bqhs/ebola/AF086833.fa
+samtools flagstat SRR1972917_dedup.bam
+```
+
 ---
 
 ## 8. Index BAM file
+
+```
+samtools index SRR1972917_dedup.bam
+```
 
 ---
 
 ## 9. Variant Calling
 
+```
+gatk HaplotypeCaller -R /home/bqhs/ebola/AF086833.fa -I SRR1972917_dedup.bam -O SRR1972917.g.vcf -ERC GVCF
+gatk HaplotypeCaller -R /home/bqhs/ebola/AF086833.fa -I SRR1972918_dedup.bam -O SRR1972918.g.vcf -ERC GVCF
+```
+
 ---
 
 ## 10. Combine Variants
 
+```
+gatk CombineGVCFs -R /home/bqhs/ebola/AF086833.fa -V SRR1972917.g.vcf -V SRR1972918.g.vcf -O combined.g.vcf
+```
 ---
 
 ## 11. Genotype Variants
+
+```
+gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.vcf -O combined.filter1.vcf \
+    -filter "QUAL < 30.0 || DP < 10" --filter-name lowQualDp
+
+gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -O combined.filter2.vcf \
+    -G-filter "GQ < 20.0" -G-filter-name lowGQ
+```
 
 ---
 
 ## 12. Variant Filtering
 
+```
+gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.vcf -O combined.filter1.vcf \
+    -filter "QUAL < 30.0 || DP < 10" --filter-name lowQualDp
+
+gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -O combined.filter2.vcf \
+    -G-filter "GQ < 20.0" -G-filter-name lowGQ
+```
+
 ---
 
 ## 13. Genotype Concordance
+
+```
+gatk GenotypeConcordance -CV combined.filter2.vcf -TV /home/bqhs/ebola/ebola-samples.vcf -O SRR1972917.concordance.grp -CS SRR1972917 -TS SRR1972917
+```
 
 
 ---
 
 ## 14. Variant Annotation
 
+```
+mamba install snpeff snpsift
+snpEff ann AF086833 -v -c /home/vedbar/miniconda3/share/snpeff-5.0-0/snpEff.config -s snpeff.html combined.filter2.vcf > combined.ann.vcf
+```
+
 ---
 
 ## 15. Extract Variant Fields
+
+```
+SnpSift extractFields combined.ann.vcf \
+    ID CHROM POS REF ALT QUAL DP FILTER \
+    ANN[0].GENE ANN[0].GENEID ANN[0].EFFECT ANN[0].IMPACT \
+    ANN[0].BIOTYPE ANN[0].HGVS_C ANN[0].HGVS_P \
+    GEN[0].GT GEN[0].GQ GEN[0].FT \
+    GEN[1].GT GEN[1].GQ GEN[1].FT > combined.txt
+```
 
 ---
