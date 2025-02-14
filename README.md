@@ -72,6 +72,8 @@ conda config --add channels conda-forge
 ```
 mkdir Germline_Variants
 cd Germline_Variants/
+```
+```
 # Download raw sequencing data
 fastq-dump --split-files -X 100000 SRR1972917
 ```
@@ -80,17 +82,25 @@ fastq-dump --split-files -X 100000 SRR1972917
 
 ## 3. QC raw reads
 
+### Run FASTQC and Trimmomatic for Quality Filtering and Trimming 
+- Quality control (QC) ensures high-quality sequencing reads by identifying and filtering low-quality sequences.
+- Input: Raw FASTQ files.
+- Output: Quality-controlled and trimmed FASTQ files.
+
 ```
 mkdir qc
 fastqc *.fastq -o qc/
+```
 
+```
 # Download adapter file and trim sequences
 curl -OL https://raw.githubusercontent.com/BioInfoTools/BBMap/master/resources/adapters.fa > adapters.fa
 trimmomatic PE SRR1972917_1.fastq SRR1972917_2.fastq \
     trimmed_1.fastq unpaired_1.fastq \
     trimmed_2.fastq unpaired_2.fastq \
     ILLUMINACLIP:adapters.fa:2:30:10 LEADING:20 TRAILING:20 AVGQUAL:20 MINLEN:20
-
+```
+```
 mkdir qc_trimmed
 fastqc trimmed_*.fastq -o qc_trimmed/
 ```
@@ -98,8 +108,13 @@ fastqc trimmed_*.fastq -o qc_trimmed/
 
 ---
 
-## 5. Align reads
+## 4. Align reads
 
+### Run bwa mem
+- Reads are aligned to the reference genome using BWA MEM, which is optimized for mapping short reads.
+- Input: Trimmed FASTQ files.
+- Output: SAM file with aligned reads.
+  
 ```
 bwa mem -R '@RG\tID:SRR1972917\tSM:SRR1972917\tPL:ILLUMINA\tLB:SRR1972917' \
     /home/bqhs/ebola/AF086833.fa trimmed_1.fastq trimmed_2.fastq > SRR1972917_raw.sam
@@ -107,7 +122,12 @@ bwa mem -R '@RG\tID:SRR1972917\tSM:SRR1972917\tPL:ILLUMINA\tLB:SRR1972917' \
 
 ---
 
-## 6. Sort alignment
+## 5. Sort alignment
+
+### Run samtools sort
+- Sorting the aligned reads is necessary to optimize downstream processing.
+- Input: SAM file.
+- Output: Sorted BAM file.
 
 ```
 samtools sort SRR1972917_raw.sam > SRR1972917_sort.bam
@@ -115,8 +135,13 @@ samtools sort SRR1972917_raw.sam > SRR1972917_sort.bam
 
 ---
 
-## 7. Mark duplicates
+## 6. Mark duplicates
 
+### Run picard MarkDuplicates
+- Input: Sorted BAM file.
+- Output: BAM file with marked duplicates.
+- Marking duplicates removes duplicate reads originating from PCR amplification, reducing bias.
+  
 ```
 picard MarkDuplicates -Xmx50g I=SRR1972917_sort.bam O=SRR1972917_dedup.bam M=SRR1972917_dedup.txt
 picard CollectAlignmentSummaryMetrics -Xmx50g INPUT=SRR1972917_dedup.bam OUTPUT=SRR1972917_aln_metrics.txt REFERENCE_SEQUENCE=/home/bqhs/ebola/AF086833.fa
@@ -125,7 +150,11 @@ samtools flagstat SRR1972917_dedup.bam
 
 ---
 
-## 8. Index BAM file
+## 7. Index BAM file
+### Run samtools index
+- Input: Deduplicated BAM file.
+- Output: Indexed BAM file.
+- Indexing enables fast access to specific genomic regions in BAM files.
 
 ```
 samtools index SRR1972917_dedup.bam
@@ -133,8 +162,13 @@ samtools index SRR1972917_dedup.bam
 
 ---
 
-## 9. Variant Calling
+## 8. Variant Calling
 
+### Run GATK HaplotypeCaller
+- Input: Indexed BAM file.
+- Output: GVCF files with called variants.
+- HaplotypeCaller identifies potential germline variants in the sequencing data.
+  
 ```
 gatk HaplotypeCaller -R /home/bqhs/ebola/AF086833.fa -I SRR1972917_dedup.bam -O SRR1972917.g.vcf -ERC GVCF
 gatk HaplotypeCaller -R /home/bqhs/ebola/AF086833.fa -I SRR1972918_dedup.bam -O SRR1972918.g.vcf -ERC GVCF
@@ -142,15 +176,37 @@ gatk HaplotypeCaller -R /home/bqhs/ebola/AF086833.fa -I SRR1972918_dedup.bam -O 
 
 ---
 
-## 10. Combine Variants
+## 9. Combine Variants
+
+### RUn GATK CombineGVCFs
+- Input: Multiple GVCF files.
+- Output: Combined GVCF file.
+- Combining multiple variant calls into a single file for joint genotyping.
 
 ```
 gatk CombineGVCFs -R /home/bqhs/ebola/AF086833.fa -V SRR1972917.g.vcf -V SRR1972918.g.vcf -O combined.g.vcf
 ```
 ---
 
-## 11. Genotype Variants
+## 10. Genotype Variants
 
+### Run GATK GenotypeGVCFs
+- Input: Combined GVCF file.
+- Output: Final VCF file with genotyped variants.
+- This step determines the most probable genotypes for each variant.
+
+```
+gatk GenotypeGVCFs -R /home/bqhs/ebola/AF086833.fa -V combined.g.vcf -O combined.vcf
+```
+
+---
+
+
+## 11. Variant Filtering
+
+### Run GATK VariantFiltration
+- Filtering removes low-confidence variants based on quality scores and read depth.
+- 
 ```
 gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.vcf -O combined.filter1.vcf \
     -filter "QUAL < 30.0 || DP < 10" --filter-name lowQualDp
@@ -161,19 +217,9 @@ gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -
 
 ---
 
-## 12. Variant Filtering
-
-```
-gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.vcf -O combined.filter1.vcf \
-    -filter "QUAL < 30.0 || DP < 10" --filter-name lowQualDp
-
-gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -O combined.filter2.vcf \
-    -G-filter "GQ < 20.0" -G-filter-name lowGQ
-```
-
----
-
-## 13. Genotype Concordance
+## 12. Genotype Concordance
+### Run GATK GenotypeConcordance
+- Evaluates the accuracy of genotype calls by comparing them to known truth datasets.
 
 ```
 gatk GenotypeConcordance -CV combined.filter2.vcf -TV /home/bqhs/ebola/ebola-samples.vcf -O SRR1972917.concordance.grp -CS SRR1972917 -TS SRR1972917
@@ -182,7 +228,9 @@ gatk GenotypeConcordance -CV combined.filter2.vcf -TV /home/bqhs/ebola/ebola-sam
 
 ---
 
-## 14. Variant Annotation
+## 13. Variant Annotation
+### Run snpEff ann
+- SnpEff annotates variants with functional information, including their impact on genes.
 
 ```
 mamba install snpeff snpsift
@@ -191,7 +239,11 @@ snpEff ann AF086833 -v -c /home/vedbar/miniconda3/share/snpeff-5.0-0/snpEff.conf
 
 ---
 
-## 15. Extract Variant Fields
+## 14. Extract Variant Fields
+### Run snpSift extractFields
+- Input: Annotated VCF file.
+- Output: Extracted variant fields in tabular format.
+- Extracts relevant fields from annotated variant files for downstream analysis.
 
 ```
 SnpSift extractFields combined.ann.vcf \
@@ -201,5 +253,11 @@ SnpSift extractFields combined.ann.vcf \
     GEN[0].GT GEN[0].GQ GEN[0].FT \
     GEN[1].GT GEN[1].GQ GEN[1].FT > combined.txt
 ```
+
+---
+
+## Contributing
+#### Contributions to improve this pipeline are welcome!
+
 
 ---
