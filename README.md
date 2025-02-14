@@ -12,7 +12,7 @@ This repository provides a step-by-step pipeline for processing germline variant
 4. [Align reads](#4-align-reads)
 5. [Sort alignment](#5-sort-alignment)
 6. [Mark duplicates](#6-mark-duplicates)
-7. [Index BAM file](#7-index-bam-fle)
+7. [Index BAM file](#7-index-bam-file)
 8. [Variant Calling](#8-variant-calling)
 9. [Combine Variants](#9-combine-variants)
 10. [Genotype Variants](#10-genotype-variants)
@@ -170,6 +170,7 @@ samtools flagstat SRR1972918_dedup.bam
 ```
 
 ---
+
 
 ## 7. Index BAM file
 
