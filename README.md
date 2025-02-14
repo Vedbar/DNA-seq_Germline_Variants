@@ -62,8 +62,8 @@ conda config --add channels conda-forge
 
 ### Dataset Information
 - The sequencing data can be retrieved from publicly available datasets:
-- The identifiers SRR1972917 and SRR1972918 correspond to sequencing runs from a study on the 2014 Ebola virus outbreak in Sierra Leone. These runs are part of the BioProject PRJNA257197 and were sequenced using the Illumina HiSeq 2500 platform. The data consists of 101 base pair paired-end reads obtained from patient blood samples through metagenomic RNA sequencing approaches. The resulting sequences belong to the SL3 clade of the Makona variant of Zaire ebolavirus.
-- Study on the 2014 Ebola virus outbreak in Sierra Leone (PMC4503805)(https://pmc.ncbi.nlm.nih.gov/articles/PMC4503805/)
+  *The identifiers SRR1972917 and SRR1972918 correspond to sequencing runs from a study on the 2014 Ebola virus outbreak in Sierra Leone. These runs are part of the             BioProject PRJNA257197 and were sequenced using the Illumina HiSeq 2500 platform. The data consists of 101 base pair paired-end reads obtained from patient blood             samples through metagenomic RNA sequencing approaches. The resulting sequences belong to the SL3 clade of the Makona variant of Zaire ebolavirus.*
+- Study on the 2014 Ebola virus outbreak in Sierra Leone [(PMC4503805)](https://pmc.ncbi.nlm.nih.gov/articles/PMC4503805/)
 - **SRA ID:** [SRR1972917](https://www-ncbi-nlm-nih-gov.eres.library.manoa.hawaii.edu/sra/?term=SRR1972917)
 - **SRA ID:** [SRR1972918](https://www-ncbi-nlm-nih-gov.eres.library.manoa.hawaii.edu/sra/?term=SRR1972918)
 - We’ll only use 100k reads
