@@ -286,7 +286,7 @@ gatk GenotypeConcordance -CV combined.filter2.vcf -TV /home/bqhs/ebola/ebola-sam
 
 ```
 # mamba install snpeff snpsift
-snpEff ann AF086833 -v -c /home/vedbar/miniconda3/share/snpeff-5.0-0/snpEff.config -s snpeff.html combined.filter2.vcf > combined.ann.vcf
+snpEff ann -v -c /home/vedbar_2025/miniconda3/share/snpeff-5.2-1/snpEff.config -s snpeff.html AF086833 combined.filter2.vcf > combined.ann.vcf
 ```
 
 ---
