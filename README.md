@@ -378,7 +378,7 @@ GEN[2].GT GEN[2].GQ GEN[2].FT > family.txt
 ```
 
 - Transfer all results to your local machine and view them.
-- 
+
 ---
 
 ## Contributing
