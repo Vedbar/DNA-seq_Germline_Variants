@@ -21,7 +21,7 @@ This repository provides a step-by-step pipeline for processing germline variant
 13. [Variant Annotation](#13-variant-annotation)
 14. [Extract Variant Fields](#14-extract-variant-fields)
 15. [Class Exercise](#15-class-exercise)
-    
+
 ---
 
 
