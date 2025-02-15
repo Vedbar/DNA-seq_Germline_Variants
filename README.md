@@ -21,6 +21,7 @@ This repository provides a step-by-step pipeline for processing germline variant
 13. [Variant Annotation](#13-variant-annotation)
 14. [Extract Variant Fields](#14-extract-variant-fields)
 15. [Class Exercise](#15-class-exercise)
+    
 ---
 
 
@@ -145,8 +146,6 @@ bwa mem -R '@RG\tID:SRR1972918\tSM:SRR1972918\tPL:ILLUMINA\tLB:SRR1972918' \
 
 ```
 samtools sort SRR1972917_raw.sam > SRR1972917_sort.bam
-```
-```
 samtools sort SRR1972918_raw.sam > SRR1972918_sort.bam
 ```
 
@@ -203,7 +202,7 @@ gatk HaplotypeCaller -R /home/bqhs/ebola/AF086833.fa -I SRR1972918_dedup.bam -O 
 
 ## 9. Combine Variants
 
-### RUn GATK CombineGVCFs
+### Run GATK CombineGVCFs
 - Input: Multiple GVCF files.
 - Output: Combined GVCF file.
 - Combining multiple variant calls into a single file for joint genotyping.
@@ -235,7 +234,7 @@ gatk GenotypeGVCFs -R /home/bqhs/ebola/AF086833.fa -V combined.g.vcf -O combined
   + -R /home/bqhs/ebola/AF086833.fa: Specifies the reference genome file (AF086833.fa).
   + -V combined.vcf: Input VCF file (combined.vcf).
   + -O combined.filter1.vcf: Output VCF file (combined.filter1.vcf) after applying the variant filters.
-  + -filter "QUAL < 30.0 || DP < 10"  Applies a filter to flag variants with:
+  + -filter *QUAL < 30.0 || DP < 10*  Applies a filter to flag variants with:
     + QUAL < 30.0: Variants with a quality score lower than 30.
     + DP < 10: Variants with a depth (number of supporting reads) lower than 10.
   + --filter-name lowQualDp: Labels filtered variants as "lowQualDp" in the VCF file.
@@ -326,7 +325,7 @@ gatk HaplotypeCaller -R /home/bqhs/hg38/genome.fa -I /home/bqhs/dna/son.bam    -
 ### Run gatk CombineGVCFs
 ```
 gatk CombineGVCFs -R /home/bqhs/hg38/genome.fa -V mother.g.vcf -V father.g.vcf -V son.g.vcf -O family.g.vcf
-# cp /home/bqhs/dna/Results/*vcf*
+# cp /home/bqhs/dna/Results/*vcf* ./
 ```
 ### Run gatk GenotypeGVCFs
 ```
@@ -340,7 +339,7 @@ grep "lowQualDp" family.filter.vcf
 ```
 ### Run gatk Calculate Genotype Posteriors
 ```
-# cp /home/bqhs/dna/trio.ped .
+cp /home/bqhs/dna/trio.ped ./
 gatk CalculateGenotypePosteriors -R /home/bqhs/hg38/genome.fa -V family.filter.vcf -ped trio.ped -supporting /home/bqhs/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz  -O family.CGP.vcf
 ```
 ### gatk Variant Filtration
@@ -377,7 +376,7 @@ GEN[1].GT GEN[1].GQ GEN[1].FT \
 GEN[2].GT GEN[2].GQ GEN[2].FT > family.txt
 ```
 
-- Transfer all results to your local machine and view them.
+### Transfer all results to your local machine via [FileZilla](https://filezilla-project.org/download.php) and view them.
 
 ---
 
