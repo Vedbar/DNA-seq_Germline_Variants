@@ -20,7 +20,7 @@ This repository provides a step-by-step pipeline for processing germline variant
 12. [Genotype Concordance](#12-genotype-concordance)
 13. [Variant Annotation](#13-variant-annotation)
 14. [Extract Variant Fields](#14-extract-variant-fields)
-
+15. [Class Exercise](#15-class-exercise)
 ---
 
 
@@ -306,6 +306,79 @@ SnpSift extractFields combined.ann.vcf \
     GEN[1].GT GEN[1].GQ GEN[1].FT > combined.txt
 ```
 
+---
+
+## 15. Class Exercise
+
+### Create Directory
+```
+mkdir Class
+cd Class  
+```
+
+### Run gatk HaplotypeCaller
+```
+gatk HaplotypeCaller -R /home/bqhs/hg38/genome.fa -I /home/bqhs/dna/mother.bam -O mother.g.vcf -ERC GVCF 
+gatk HaplotypeCaller -R /home/bqhs/hg38/genome.fa -I /home/bqhs/dna/father.bam -O father.g.vcf -ERC GVCF 
+gatk HaplotypeCaller -R /home/bqhs/hg38/genome.fa -I /home/bqhs/dna/son.bam    -O son.g.vcf -ERC GVCF
+```
+
+### Run gatk CombineGVCFs
+```
+gatk CombineGVCFs -R /home/bqhs/hg38/genome.fa -V mother.g.vcf -V father.g.vcf -V son.g.vcf -O family.g.vcf
+# cp /home/bqhs/dna/Results/*vcf*
+```
+### Run gatk GenotypeGVCFs
+```
+gatk GenotypeGVCFs -R /home/bqhs/hg38/genome.fa -V family.g.vcf -O family.vcf
+```
+
+### Run gatk Variant Filtration
+```
+gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.vcf -O family.filter.vcf -filter "QUAL < 30.0 || DP < 10" --filter-name lowQualDp 
+grep "lowQualDp" family.filter.vcf
+```
+### Run gatk Calculate Genotype Posteriors
+```
+# cp /home/bqhs/dna/trio.ped .
+gatk CalculateGenotypePosteriors -R /home/bqhs/hg38/genome.fa -V family.filter.vcf -ped trio.ped -supporting /home/bqhs/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz  -O family.CGP.vcf
+```
+### gatk Variant Filtration
+```
+gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.CGP.vcf -O family.CGP.filter.vcf -G-filter "GQ < 20.0" -G-filter-name lowGQ 
+grep "lowGQ" family.CGP.filter.vcf
+```
+### Run gatk GenotypeConcordance
+```
+# gatk CollectVariantCallingMetrics –I family.CGP.filter.vcf --DBSNP /home/bqhs/hg38/dbsnp_146.hg38.vcf.gz -O family.CGP.filter.vcf.metrics
+# gatk GenotypeConcordance -CV [your callset vcf] -TV [truth set vcf] -O [output name] -CS [sample name in your callset] -TS [sample name in truth set]
+```
+### Run snpEff ann
+
+```
+#conda install snpeff 
+#conda install snpsift
+#snpEff ann
+#SnpSift extractFields
+ snpEff  -Xmx10g ann hg38  -v -s snpeff.html family.CGP.filter.vcf > family.ann.vcf
+```
+### Run SnpSift extractFields
+```
+SnpSift annotate /home/bqhs/hg38/dbsnp_146.hg38.vcf.gz family.ann.vcf > family.ann2.vcf
+```
+### Getting a spreadsheet of variants with annotations
+```
+SnpSift extractFields family.ann2.vcf \
+ID CHROM POS REF ALT QUAL DP FILTER \
+ANN[0].GENE ANN[0].GENEID ANN[0].EFFECT ANN[0].IMPACT \
+ANN[0].BIOTYPE ANN[0].HGVS_C ANN[0].HGVS_P \
+GEN[0].GT GEN[0].GQ GEN[0].FT \
+GEN[1].GT GEN[1].GQ GEN[1].FT \
+GEN[2].GT GEN[2].GQ GEN[2].FT > family.txt
+```
+
+- Transfer all results to your local machine and view them.
+- 
 ---
 
 ## Contributing
