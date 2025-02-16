@@ -362,20 +362,35 @@ gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.vcf -O family.filt
 grep "lowQualDp" family.filter.vcf
 ```
 ### Run gatk Calculate Genotype Posteriors
++ `gatk CalculateGenotypePosteriors` is used to refine genotype calls by incorporating population-level allele frequency data and Mendelian inheritance priors (if family data is available).
++ This step improves genotype accuracy by adjusting posterior probabilities of genotypes based on additional information.
+
 ```
 cp /home/bqhs/dna/trio.ped ./
 gatk CalculateGenotypePosteriors -R /home/bqhs/hg38/genome.fa -V family.filter.vcf -ped trio.ped -supporting /home/bqhs/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz  -O family.CGP.vcf
 ```
+
+
+### Key Benefits
++ Reduces Genotyping Errors: Especially useful for low-depth variants.
++ Improves Call Confidence: Helps resolve ambiguous genotype calls (e.g., between heterozygous and homozygous states).
++ Hardy-Weinberg Equilibrium (HWE) Expectations: Adjusts genotype probabilities based on expected allele distributions.
++  Enhances Rare Variant Detection: Uses prior knowledge to detect true low-frequency variants that may be overlooked.
+
+
+
 ### gatk Variant Filtration
 ```
 gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.CGP.vcf -O family.CGP.filter.vcf -G-filter "GQ < 20.0" -G-filter-name lowGQ 
 grep "lowGQ" family.CGP.filter.vcf
 ```
+
 ### Run gatk GenotypeConcordance
 ```
 # gatk CollectVariantCallingMetrics –I family.CGP.filter.vcf --DBSNP /home/bqhs/hg38/dbsnp_146.hg38.vcf.gz -O family.CGP.filter.vcf.metrics
 # gatk GenotypeConcordance -CV [your callset vcf] -TV [truth set vcf] -O [output name] -CS [sample name in your callset] -TS [sample name in truth set]
 ```
+
 ### Run snpEff ann
 
 ```
