@@ -246,12 +246,12 @@ gatk GenotypeGVCFs -R /home/bqhs/ebola/AF086833.fa -V combined.g.vcf -O combined
 - You can later remove or ignore these flagged variants depending on your analysis needs.
 - Arguments:
   + `-R /home/bqhs/ebola/AF086833.fa`: Specifies the reference genome file (AF086833.fa).
-  + '-V combined.vcf': Input VCF file (combined.vcf).
-  + '-O combined.filter1.vcf': Output VCF file (combined.filter1.vcf) after applying the variant filters.
-  + '-filter *QUAL < 30.0 || DP < 10*'  Applies a filter to flag variants with:
+  + `-V combined.vcf`: Input VCF file (combined.vcf).
+  + `-O combined.filter1.vcf`: Output VCF file (combined.filter1.vcf) after applying the variant filters.
+  + `-filter *QUAL < 30.0 || DP < 10*`  Applies a filter to flag variants with:
     + QUAL < 30.0: Variants with a quality score lower than 30.
     + DP < 10: Variants with a depth (number of supporting reads) lower than 10.
-  + '--filter-name lowQualDp': Labels filtered variants as "lowQualDp" in the VCF file.
+  + `--filter-name lowQualDp`: Labels filtered variants as "lowQualDp" in the VCF file.
 
 ```
 gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.vcf -O combined.filter1.vcf \
