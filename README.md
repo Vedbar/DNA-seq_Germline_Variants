@@ -229,6 +229,9 @@ gatk CombineGVCFs -R /home/bqhs/ebola/AF086833.fa -V SRR1972917.g.vcf -V SRR1972
 ```
 gatk GenotypeGVCFs -R /home/bqhs/ebola/AF086833.fa -V combined.g.vcf -O combined.vcf
 ```
+### What's the difference between GVCF and VCF?
++ GVCF (Genomic VCF) is an intermediate format containing both variant sites and non-variant sites with reference confidence intervals useful for multi-sample workflows.
++ VCF (Variant Call Format) is the final output that contains only the detected variants.
 
 ---
 
