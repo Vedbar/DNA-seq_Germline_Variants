@@ -271,6 +271,7 @@ gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.vcf -O combin
 gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -O combined.filter2.vcf \
     -G-filter "GQ < 20.0" -G-filter-name lowGQ
 ```
+
 ### Why Perform Both Steps?
 + The first step ensures only high-confidence variant sites are considered.
 + The second step ensures only high-confidence genotypes are retained for each individual sample.
@@ -281,12 +282,12 @@ gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -
 ## 12. Genotype Concordance
 ### Run GATK GenotypeConcordance
 - Evaluates the accuracy of genotype calls by comparing them to known truth datasets.
-### When Should You Run Genotype Concordance?
+### When should you run Genotype Concordance?
 - If you have a known truth dataset (e.g., HapMap, GIAB) and want to evaluate accuracy.
 - If you're comparing different variant calling methods or different filtering strategies.
 - If you need to ensure consistency in genotyping across samples or sequencing batches
   + Useful in clinical and forensic applications where accurate genotyping is critical.
-### When is Genotype Concordance Not Needed?
+### When is Genotype Concordance not needed?
 - If you are working with de novo variant calls and don't have a truth set for comparison.
 - If your dataset lacks matched ground truth genotypes.
 
