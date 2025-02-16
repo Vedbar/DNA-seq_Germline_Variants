@@ -209,6 +209,7 @@ gatk HaplotypeCaller -R /home/bqhs/ebola/AF086833.fa -I SRR1972918_dedup.bam -O 
 ## 9. Combine Variants
 
 ### Run GATK CombineGVCFs
+- This command merges individual GVCF files into one combined GVCF file. 
 - Input: Multiple GVCF files.
 - Output: Combined GVCF file.
 - Combining multiple variant calls into a single file for joint genotyping.
@@ -221,9 +222,9 @@ gatk CombineGVCFs -R /home/bqhs/ebola/AF086833.fa -V SRR1972917.g.vcf -V SRR1972
 ## 10. Genotype Variants
 
 ### Run GATK GenotypeGVCFs
+- This command uses the combined GVCF file (`combined.g.vcf`) to perform the final joint genotyping step and produce a standard VCF (`combined.vcf`) containing the called variants for all samples. 
 - Input: Combined GVCF file.
 - Output: Final VCF file with genotyped variants.
-- This step determines the most probable genotypes for each variant.
 
 ```
 gatk GenotypeGVCFs -R /home/bqhs/ebola/AF086833.fa -V combined.g.vcf -O combined.vcf
