@@ -245,7 +245,7 @@ gatk GenotypeGVCFs -R /home/bqhs/ebola/AF086833.fa -V combined.g.vcf -O combined
 - The output vcf file contains all variants from  input vcf file, but those that do not meet the filtering criteria are flagged with "lowQualDp".
 - You can later remove or ignore these flagged variants depending on your analysis needs.
 - Arguments:
-  + -R /home/bqhs/ebola/AF086833.fa: Specifies the reference genome file (AF086833.fa).
+  + '-R /home/bqhs/ebola/AF086833.fa': Specifies the reference genome file (AF086833.fa).
   + -V combined.vcf: Input VCF file (combined.vcf).
   + -O combined.filter1.vcf: Output VCF file (combined.filter1.vcf) after applying the variant filters.
   + -filter *QUAL < 30.0 || DP < 10*  Applies a filter to flag variants with:
