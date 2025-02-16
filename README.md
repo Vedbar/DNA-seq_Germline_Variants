@@ -189,6 +189,7 @@ samtools index SRR1972918_dedup.bam
 ## 8. Variant Calling
 
 ### Run GATK HaplotypeCaller
+- HaplotypeCaller is a tool from the GATK (Genome Analysis Toolkit) used for variant discovery (i.e., finding SNPs and small indels).
 - Input: Indexed BAM file.
 - Output: GVCF files with called variants.
 - HaplotypeCaller identifies potential germline variants in the sequencing data.
@@ -197,6 +198,10 @@ samtools index SRR1972918_dedup.bam
 gatk HaplotypeCaller -R /home/bqhs/ebola/AF086833.fa -I SRR1972917_dedup.bam -O SRR1972917.g.vcf -ERC GVCF
 gatk HaplotypeCaller -R /home/bqhs/ebola/AF086833.fa -I SRR1972918_dedup.bam -O SRR1972918.g.vcf -ERC GVCF
 ```
+### Why use `-ERC GVCF` ?
++ This instructs HaplotypeCaller to output an intermediate GVCF (Genomic VCF) file.
++ Unlike a standard VCF which contains only sites determined to be variant, a GVCF contains information for all sites in the genome (both variant and non-variant), accompanied by reference confidence information.
++ GVCF output is especially useful to perform joint genotyping on multiple samples later.
 
 ---
 
