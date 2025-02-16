@@ -238,8 +238,12 @@ gatk GenotypeGVCFs -R /home/bqhs/ebola/AF086833.fa -V combined.g.vcf -O combined
 
 ## 11. Variant Filtering
 
+### 1st Filtering Step (Site-Level Filtering)
+
 ### Run GATK VariantFiltration
-- This step removes low-quality variant calls and those with insufficient sequencing depth
+- This command applies variant filtration to the combined.vcf file, marking variants that do not meet quality and depth thresholds.
+- The output vcf file contains all variants from  input vcf file, but those that do not meet the filtering criteria are flagged with "lowQualDp".
+- You can later remove or ignore these flagged variants depending on your analysis needs.
 - Arguments:
   + -R /home/bqhs/ebola/AF086833.fa: Specifies the reference genome file (AF086833.fa).
   + -V combined.vcf: Input VCF file (combined.vcf).
