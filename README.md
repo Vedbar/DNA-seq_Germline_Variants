@@ -344,8 +344,13 @@ gatk HaplotypeCaller -R /home/bqhs/hg38/genome.fa -I /home/bqhs/dna/son.bam    -
 ### Run gatk CombineGVCFs
 ```
 gatk CombineGVCFs -R /home/bqhs/hg38/genome.fa -V mother.g.vcf -V father.g.vcf -V son.g.vcf -O family.g.vcf
-# cp /home/bqhs/dna/Results/*vcf* ./
 ```
+
+#*Note: Running gatk on big files takes time. So, you can copy vcf files and proceed to downstream analysis
+```
+cp /home/bqhs/dna/Results/*vcf* ./
+```
+
 ### Run gatk GenotypeGVCFs
 ```
 gatk GenotypeGVCFs -R /home/bqhs/hg38/genome.fa -V family.g.vcf -O family.vcf
