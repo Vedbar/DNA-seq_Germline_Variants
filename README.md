@@ -258,13 +258,14 @@ gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.vcf -O combin
     -filter "QUAL < 30.0 || DP < 10" --filter-name lowQualDp
 ```
 
+### 2nd Filtering Step (Genotype-Level Filtering)
 - This step flags low-confidence genotype calls at the sample level, ensuring that only reliable genotype calls are retained.
 - Arguments:
   + `-R /home/bqhs/ebola/AF086833.fa`: Specifies the reference genome file (AF086833.fa).
   + `-V combined.filter1.vcf`: Takes the previously filtered VCF file (combined.filter1.vcf) as input.
   + `-O combined.filter2.vcf`: Outputs a new VCF file (combined.filter2.vcf) after applying genotype filters.
   + `-G-filter "GQ < 20.0"`: Applies a genotype-level filter to flag individual genotype calls where:
-  + `GQ < 20.0`: Genotype quality score is below 20.
+      + GQ < 20.0: Genotype quality score is below 20.
   + `-G-filter-name lowGQ`: Labels filtered genotype calls as "lowGQ" in the VCF file.
 
 ```
