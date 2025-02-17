@@ -388,9 +388,20 @@ gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.CGP.vcf -O family.
 grep "lowGQ" family.CGP.filter.vcf
 ```
 
-### Run gatk GenotypeConcordance
+### Run gatk CollectVariantCallingMetrics
++ CollectVariantCallingMetrics is a quality control (QC) tool used to assess the performance of variant calling by comparing a VCF file against a known database (e.g., dbSNP).
++ It generates variant calling statistics, helping to evaluate the accuracy and reliability of detected variants.
+
 ```
-# gatk CollectVariantCallingMetrics –I family.CGP.filter.vcf --DBSNP /home/bqhs/hg38/dbsnp_146.hg38.vcf.gz -O family.CGP.filter.vcf.metrics
+gatk CollectVariantCallingMetrics \
+   -I family.CGP.filter.vcf \
+   --DBSNP /home/bqhs/hg38/dbsnp_146.hg38.vcf.gz \
+   -O family.CGP.filter.metrics
+```
+
+### Run gatk GenotypeConcordance
++ GenotypeConcordance is used to compare two VCF files and measure agreement between genotype calls.
+```
 # gatk GenotypeConcordance -CV [your callset vcf] -TV [truth set vcf] -O [output name] -CS [sample name in your callset] -TS [sample name in truth set]
 ```
 
