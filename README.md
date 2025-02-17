@@ -380,9 +380,9 @@ gatk CalculateGenotypePosteriors -R /home/bqhs/hg38/genome.fa -V family.filter.v
 + Hardy-Weinberg Equilibrium (HWE) Expectations: Adjusts genotype probabilities based on expected allele distributions.
 +  Enhances Rare Variant Detection: Uses prior knowledge to detect true low-frequency variants that may be overlooked.
 
+**Note: it is recommended to run CalculateGenotypePosteriors before VariantFiltration.**
 
-
-### gatk Variant Filtration
+### Run gatk Variant Filtration
 ```
 gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.CGP.vcf -O family.CGP.filter.vcf -G-filter "GQ < 20.0" -G-filter-name lowGQ 
 grep "lowGQ" family.CGP.filter.vcf
