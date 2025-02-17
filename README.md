@@ -160,12 +160,12 @@ samtools sort SRR1972918_raw.sam > SRR1972918_sort.bam
   
 ```
 picard MarkDuplicates -Xmx10g I=SRR1972917_sort.bam O=SRR1972917_dedup.bam M=SRR1972917_dedup.txt
-picard CollectAlignmentSummaryMetrics -Xmx50g INPUT=SRR1972917_dedup.bam OUTPUT=SRR1972917_aln_metrics.txt REFERENCE_SEQUENCE=/home/bqhs/ebola/AF086833.fa
+picard CollectAlignmentSummaryMetrics -Xmx10g INPUT=SRR1972917_dedup.bam OUTPUT=SRR1972917_aln_metrics.txt REFERENCE_SEQUENCE=/home/bqhs/ebola/AF086833.fa
 samtools flagstat SRR1972917_dedup.bam
 ```
 ```
 picard MarkDuplicates -Xmx10g I=SRR1972918_sort.bam O=SRR1972918_dedup.bam M=SRR1972918_dedup.txt
-picard CollectAlignmentSummaryMetrics -Xmx50g INPUT=SRR1972918_dedup.bam OUTPUT=SRR1972918_aln_metrics.txt REFERENCE_SEQUENCE=/home/bqhs/ebola/AF086833.fa
+picard CollectAlignmentSummaryMetrics -Xmx10g INPUT=SRR1972918_dedup.bam OUTPUT=SRR1972918_aln_metrics.txt REFERENCE_SEQUENCE=/home/bqhs/ebola/AF086833.fa
 samtools flagstat SRR1972918_dedup.bam
 ```
 
