@@ -153,10 +153,10 @@ samtools sort SRR1972918_raw.sam > SRR1972918_sort.bam
 
 ## 6. Mark duplicates
 
-### Run picard MarkDuplicates
+### Run Picard MarkDuplicates
+- Marking duplicates using Picard's MarkDuplicates identifies and flags duplicate reads that originate from PCR amplification, reducing bias in downstream analyses such as variant calling. 
 - Input: Sorted BAM file.
 - Output: BAM file with marked duplicates.
-- Marking duplicates removes duplicate reads originating from PCR amplification, reducing bias.
   
 ```
 picard MarkDuplicates -Xmx10g I=SRR1972917_sort.bam O=SRR1972917_dedup.bam M=SRR1972917_dedup.txt
@@ -175,9 +175,9 @@ samtools flagstat SRR1972918_dedup.bam
 ## 7. Index BAM file
 
 ### Run samtools index
+- Indexing enables fast access to specific genomic regions in BAM files.
 - Input: Deduplicated BAM file.
 - Output: Indexed BAM file.
-- Indexing enables fast access to specific genomic regions in BAM files.
 
 ```
 samtools index SRR1972917_dedup.bam
