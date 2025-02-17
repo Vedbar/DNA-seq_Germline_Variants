@@ -190,9 +190,9 @@ samtools index SRR1972918_dedup.bam
 
 ### Run GATK HaplotypeCaller
 - HaplotypeCaller is a tool from the GATK (Genome Analysis Toolkit) used for variant discovery (i.e., finding SNPs and small indels).
+- HaplotypeCaller identifies potential germline variants in the sequencing data.
 - Input: Indexed BAM file.
 - Output: GVCF files with called variants.
-- HaplotypeCaller identifies potential germline variants in the sequencing data.
   
 ```
 gatk HaplotypeCaller -R /home/bqhs/ebola/AF086833.fa -I SRR1972917_dedup.bam -O SRR1972917.g.vcf -ERC GVCF
@@ -212,7 +212,6 @@ gatk HaplotypeCaller -R /home/bqhs/ebola/AF086833.fa -I SRR1972918_dedup.bam -O 
 - This command merges individual GVCF files into one combined GVCF file. 
 - Input: Multiple GVCF files.
 - Output: Combined GVCF file.
-- Combining multiple variant calls into a single file for joint genotyping.
 
 ```
 gatk CombineGVCFs -R /home/bqhs/ebola/AF086833.fa -V SRR1972917.g.vcf -V SRR1972918.g.vcf -O combined.g.vcf
@@ -274,7 +273,9 @@ gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -
 
 ### Why Perform Both Steps?
 + The first step ensures only high-confidence variant sites are considered.
+  + QUAL represents the probability that the site contains a variant rather than being a sequencing error.
 + The second step ensures only high-confidence genotypes are retained for each individual sample.
+  + A higher GQ score means higher confidence that the called genotype (e.g., 0/0, 0/1, 1/1) is correct. 
 + This two-step approach is critical in multi-sample studies, where some samples may have poor genotype confidence even if the site passes the variant-level filters.
 
 ---
