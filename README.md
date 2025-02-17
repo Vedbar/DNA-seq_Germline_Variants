@@ -283,6 +283,11 @@ gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -
 ## 12. Genotype Concordance
 ### Run GATK GenotypeConcordance
 - Evaluates the accuracy of genotype calls by comparing them to known truth datasets.
+
+```
+gatk GenotypeConcordance -CV combined.filter2.vcf -TV /home/bqhs/ebola/ebola-samples.vcf -O SRR1972917.concordance.grp -CS SRR1972917 -TS SRR1972917
+```
+
 ### When should you run Genotype Concordance?
 - If you have a known truth dataset (e.g., HapMap, GIAB) and want to evaluate accuracy.
 - If you're comparing different variant calling methods or different filtering strategies.
@@ -292,17 +297,13 @@ gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -
 - If you are working with de novo variant calls and don't have a truth set for comparison.
 - If your dataset lacks matched ground truth genotypes.
 
-```
-gatk GenotypeConcordance -CV combined.filter2.vcf -TV /home/bqhs/ebola/ebola-samples.vcf -O SRR1972917.concordance.grp -CS SRR1972917 -TS SRR1972917
-```
-
-
 ---
 
 ## 13. Variant Annotation
 ### Run snpEff ann
 - SnpEff annotates variants with functional information, including their impact on genes.
-
+- Learn more on [SnpEff & SnpSift](https://pcingola.github.io/SnpEff/)
+  
 ```
 # mamba install snpeff snpsift
 snpEff ann -v -c /home/vedbar_2025/miniconda3/share/snpeff-5.2-1/snpEff.config -s snpeff.html AF086833 combined.filter2.vcf > combined.ann.vcf
@@ -312,9 +313,9 @@ snpEff ann -v -c /home/vedbar_2025/miniconda3/share/snpeff-5.2-1/snpEff.config -
 
 ## 14. Extract Variant Fields
 ### Run snpSift extractFields
+- Extracts relevant fields from annotated variant files for downstream analysis.
 - Input: Annotated VCF file.
 - Output: Extracted variant fields in tabular format.
-- Extracts relevant fields from annotated variant files for downstream analysis.
 
 ```
 SnpSift extractFields combined.ann.vcf \
@@ -360,8 +361,12 @@ gatk GenotypeGVCFs -R /home/bqhs/hg38/genome.fa -V family.g.vcf -O family.vcf
 ### Run gatk Variant Filtration
 ```
 gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.vcf -O family.filter.vcf -filter "QUAL < 30.0 || DP < 10" --filter-name lowQualDp 
+```
+```
+# Check the flags
 grep "lowQualDp" family.filter.vcf
 ```
+
 ### Run gatk Calculate Genotype Posteriors
 + `gatk CalculateGenotypePosteriors` is used to refine genotype calls by incorporating population-level allele frequency data and Mendelian inheritance priors (if family data is available).
 + This step improves genotype accuracy by adjusting posterior probabilities of genotypes based on additional information.
@@ -377,15 +382,18 @@ gatk CalculateGenotypePosteriors -R /home/bqhs/hg38/genome.fa -V family.filter.v
 
 ### Key Benefits of calculating genotype posterior 
 + Reduces Genotyping Errors: Especially useful for low-depth variants.
-+ Improves Call Confidence: Helps resolve ambiguous genotype calls (e.g., between heterozygous and homozygous states).
++ Improves Call Confidence: Helps resolve ambiguous genotype calls (e.g., between heterozygous and homozygous states). Improves GQ scores, making genotype calls more accurate.
 + Hardy-Weinberg Equilibrium (HWE) Expectations: Adjusts genotype probabilities based on expected allele distributions.
 +  Enhances Rare Variant Detection: Uses prior knowledge to detect true low-frequency variants that may be overlooked.
 
-**Note: it is recommended to run CalculateGenotypePosteriors before VariantFiltration.**
+**Note: It is recommended to run CalculateGenotypePosteriors before VariantFiltration.**
 
 ### Run gatk Variant Filtration
 ```
 gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.CGP.vcf -O family.CGP.filter.vcf -G-filter "GQ < 20.0" -G-filter-name lowGQ 
+```
+```
+# Check the flags
 grep "lowGQ" family.CGP.filter.vcf
 ```
 
