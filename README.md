@@ -367,10 +367,12 @@ grep "lowQualDp" family.filter.vcf
 
 ```
 cp /home/bqhs/dna/trio.ped ./
+```
+![Pedigree](Pedigree.png "Pedigree") 
+
+```
 gatk CalculateGenotypePosteriors -R /home/bqhs/hg38/genome.fa -V family.filter.vcf -ped trio.ped -supporting /home/bqhs/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz  -O family.CGP.vcf
 ```
-
-![Pedigree](Pedigree.png "Pedigree") 
 
 ### Key Benefits of calculating genotype posterior 
 + Reduces Genotyping Errors: Especially useful for low-depth variants.
