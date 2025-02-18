@@ -98,6 +98,8 @@ fastqc *.fastq -o qc/
 ```
 # Download adapter file and trim sequences
 curl -OL https://raw.githubusercontent.com/BioInfoTools/BBMap/master/resources/adapters.fa > adapters.fa
+```
+```
 trimmomatic PE SRR1972917_1.fastq SRR1972917_2.fastq \
     SRR1972917_trimmed_1.fastq SRR1972917_unpaired_1.fastq \
     SRR1972917_trimmed_2.fastq SRR1972917_unpaired_2.fastq \
@@ -159,8 +161,11 @@ samtools sort SRR1972918_raw.sam > SRR1972918_sort.bam
 - Output: BAM file with marked duplicates.
   
 ```
+# Mark Duplicates
 picard MarkDuplicates -Xmx10g I=SRR1972917_sort.bam O=SRR1972917_dedup.bam M=SRR1972917_dedup.txt
+# Collect Alignment Metrics
 picard CollectAlignmentSummaryMetrics -Xmx10g INPUT=SRR1972917_dedup.bam OUTPUT=SRR1972917_aln_metrics.txt REFERENCE_SEQUENCE=/home/bqhs/ebola/AF086833.fa
+# Provides summary of alignment statistics
 samtools flagstat SRR1972917_dedup.bam
 ```
 ```
@@ -183,7 +188,13 @@ samtools flagstat SRR1972918_dedup.bam
 samtools index SRR1972917_dedup.bam
 samtools index SRR1972918_dedup.bam
 ```
-
+**Note: Base Quality Score Recalibration (BQSR) is generally recommended before running GATK HaplotypeCaller for WGS or WES data.**
++ Corrects systematic errors in base quality scores.
++ Improves variant calling accuracy.
++ Recommended for large datasets.
++ Skip if working with RNA-seq data.
++ Skip if your sequencing technology already produces high-quality base scores.
++ Skip if you lack a reliable set of known variants for your population.
 ---
 
 ## 8. Variant Calling
@@ -239,8 +250,8 @@ gatk GenotypeGVCFs -R /home/bqhs/ebola/AF086833.fa -V combined.g.vcf -O combined
 
 ### Run GATK VariantFiltration
 ### 1st Filtering Step (Site-Level Filtering)
-- This command applies variant filtration to the combined.vcf file, marking variants that do not meet quality and depth thresholds.
-- The output vcf file contains all variants from  input vcf file, but those that do not meet the filtering criteria are flagged with "lowQualDp".
+- This command applies variant filtration to the `combined.vcf` file.
+- The output vcf file contains all variants from  input vcf file but those that do not meet the filtering (quality and depth thresholds) criteria are flagged with "lowQualDp".
 - You can later remove or ignore these flagged variants depending on your analysis needs.
 - Arguments:
   + `-R /home/bqhs/ebola/AF086833.fa`: Specifies the reference genome file (AF086833.fa).
@@ -257,7 +268,8 @@ gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.vcf -O combin
 ```
 
 ### 2nd Filtering Step (Genotype-Level Filtering)
-- This step flags low-confidence genotype calls at the sample level, ensuring that only reliable genotype calls are retained.
+- This step flags low-confidence genotype calls at the sample level.
+- Helps ensuring that only reliable genotype calls are retained.
 - Arguments:
   + `-R /home/bqhs/ebola/AF086833.fa`: Specifies the reference genome file (AF086833.fa).
   + `-V combined.filter1.vcf`: Takes the previously filtered VCF file (combined.filter1.vcf) as input.
@@ -283,7 +295,14 @@ gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -
 ## 12. Genotype Concordance
 ### Run GATK GenotypeConcordance
 - Evaluates the accuracy of genotype calls by comparing them to known truth datasets.
+- Arguments:
+  +  `-CV combined.filter2.vcf`: Callset VCF file (the file you generated from variant calling).
+  +  `-TV /home/bqhs/ebola/ebola-samples.vcf`: Truth VCF file (a reference VCF containing known variants).
+  +  `-O SRR1972917.concordance.grp`: Output concordance report.
+  +  `-CS SRR1972917`: Callset sample name.
+  +  `-TS SRR1972917`: Truth sample name.
 
+  
 ```
 gatk GenotypeConcordance -CV combined.filter2.vcf -TV /home/bqhs/ebola/ebola-samples.vcf -O SRR1972917.concordance.grp -CS SRR1972917 -TS SRR1972917
 ```
@@ -303,10 +322,22 @@ gatk GenotypeConcordance -CV combined.filter2.vcf -TV /home/bqhs/ebola/ebola-sam
 ### Run snpEff ann
 - SnpEff annotates variants with functional information, including their impact on genes.
 - Learn more on [SnpEff & SnpSift](https://pcingola.github.io/SnpEff/)
+- Arguments:
+  + `snpEff ann` Annotation mode (ann stands for "annotate").
+  + `-v` Verbose mode (useful for debugging).
+  + `-c /home/vedbar_2025/miniconda3/share/snpeff-5.2-1/snpEff.config` Specifies the configuration file location.
+  + `-s snpeff.html` Generates a summary HTML report (snpeff.html).
+  + `AF086833` The reference genome name (must match a genome database in snpEff).
+  + `combined.filter2.vcf` Input VCF file with variants to annotate.
+  + `combined.ann.vcf` Output as a new annotated VCF file.
   
 ```
 # mamba install snpeff snpsift
-snpEff ann -v -c /home/vedbar_2025/miniconda3/share/snpeff-5.2-1/snpEff.config -s snpeff.html AF086833 combined.filter2.vcf > combined.ann.vcf
+snpEff ann -v \
+  -c /home/vedbar_2025/miniconda3/share/snpeff-5.2-1/snpEff.config \
+  -s snpeff.html \
+  AF086833 \
+  combined.filter2.vcf > combined.ann.vcf
 ```
 
 ---
@@ -325,6 +356,29 @@ SnpSift extractFields combined.ann.vcf \
     GEN[0].GT GEN[0].GQ GEN[0].FT \
     GEN[1].GT GEN[1].GQ GEN[1].FT > combined.txt
 ```
+
+### Explanation of Each Field:
++  `ID` -> Variant ID (if available)
++  `CHROM` -> Chromosome name
++  `POS` -> Position of the variant
++  `REF` -> Reference allele
++  `ALT` -> Alternate allele(s)
++  `QUAL` ->	Quality score
++  `DP` ->	Read depth
++  `FILTER` ->	Filter status (PASS or other filters)
++  `ANN[0].GENE` ->	Gene name affected by the variant
++  `ANN[0].GENEID` ->	Gene ID (if available)
++  `ANN[0].EFFECT` ->	Predicted effect of the variant (e.g., missense_variant, synonymous_variant)
++  `ANN[0].IMPACT` ->	Impact classification (HIGH, MODERATE, LOW, MODIFIER)
++  `ANN[0].BIOTYPE` ->	Gene biotype (protein-coding, lncRNA, etc.)
++  `ANN[0].HGVS_C` ->	HGVS notation for coding sequence change
++  `ANN[0].HGVS_P` ->	HGVS notation for protein change
++  `GEN[0].GT` ->	Genotype of the first sample (0/1, 1/1, etc.)
++  `GEN[0].GQ` ->	Genotype quality for the first sample
++  `GEN[0].FT` ->	Filter status for the first sample
++  `GEN[1].GT` ->	Genotype of the second sample (if applicable)
++  `GEN[1].GQ` ->	Genotype quality for the second sample
++  `GEN[1].FT` ->	Filter status for the second sample
 
 ---
 
