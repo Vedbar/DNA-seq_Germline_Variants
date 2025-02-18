@@ -364,27 +364,27 @@ SnpSift extractFields combined.ann.vcf \
 ```
 
 ### Explanation of Each Field:
-+  `ID` -> Variant ID (if available)
-+  `CHROM` -> Chromosome name
-+  `POS` -> Position of the variant
-+  `REF` -> Reference allele
-+  `ALT` -> Alternate allele(s)
-+  `QUAL` ->	Quality score
-+  `DP` ->	Read depth
-+  `FILTER` ->	Filter status (PASS or other filters)
-+  `ANN[0].GENE` ->	Gene name affected by the variant
-+  `ANN[0].GENEID` ->	Gene ID (if available)
-+  `ANN[0].EFFECT` ->	Predicted effect of the variant (e.g., missense_variant, synonymous_variant)
-+  `ANN[0].IMPACT` ->	Impact classification (HIGH, MODERATE, LOW, MODIFIER)
-+  `ANN[0].BIOTYPE` ->	Gene biotype (protein-coding, lncRNA, etc.)
-+  `ANN[0].HGVS_C` ->	HGVS notation for coding sequence change
-+  `ANN[0].HGVS_P` ->	HGVS notation for protein change
-+  `GEN[0].GT` ->	Genotype of the first sample (0/1, 1/1, etc.)
-+  `GEN[0].GQ` ->	Genotype quality for the first sample
-+  `GEN[0].FT` ->	Filter status for the first sample
-+  `GEN[1].GT` ->	Genotype of the second sample (if applicable)
-+  `GEN[1].GQ` ->	Genotype quality for the second sample
-+  `GEN[1].FT` ->	Filter status for the second sample
++  `ID` → Variant ID (if available)
++  `CHROM` → Chromosome name
++  `POS` → Position of the variant
++  `REF` → Reference allele
++  `ALT` → Alternate allele(s)
++  `QUAL` →	Quality score
++  `DP` →	Read depth
++  `FILTER` →	Filter status (PASS or other filters)
++  `ANN[0].GENE` →	Gene name affected by the variant
++  `ANN[0].GENEID` →	Gene ID (if available)
++  `ANN[0].EFFECT` →	Predicted effect of the variant (e.g., missense_variant, synonymous_variant)
++  `ANN[0].IMPACT` →	Impact classification (HIGH, MODERATE, LOW, MODIFIER)
++  `ANN[0].BIOTYPE` →	Gene biotype (protein-coding, lncRNA, etc.)
++  `ANN[0].HGVS_C` →	HGVS notation for coding sequence change
++  `ANN[0].HGVS_P` →	HGVS notation for protein change
++  `GEN[0].GT` →	Genotype of the first sample (0/1, 1/1, etc.)
++  `GEN[0].GQ` →	Genotype quality for the first sample
++  `GEN[0].FT` →	Filter status for the first sample
++  `GEN[1].GT` →	Genotype of the second sample (if applicable)
++  `GEN[1].GQ` →	Genotype quality for the second sample
++  `GEN[1].FT` →	Filter status for the second sample
 
 ---
 
