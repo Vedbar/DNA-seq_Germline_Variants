@@ -188,13 +188,14 @@ samtools flagstat SRR1972918_dedup.bam
 samtools index SRR1972917_dedup.bam
 samtools index SRR1972918_dedup.bam
 ```
-**Note: Base Quality Score Recalibration (BQSR) is generally recommended before running GATK HaplotypeCaller for WGS or WES data.**
-+ Corrects systematic errors in base quality scores.
-+ Improves variant calling accuracy.
-+ Recommended for large datasets.
-+ Skip if working with RNA-seq data.
-+ Skip if your sequencing technology already produces high-quality base scores.
-+ Skip if you lack a reliable set of known variants for your population.
+#### *Note: Base Quality Score Recalibration (BQSR) is generally recommended before running GATK HaplotypeCaller for WGS or WES data.*
+  + Corrects systematic errors in base quality scores.
+  + Improves variant calling accuracy.
+  + Recommended for large datasets.
+  + Skip if working with RNA-seq data.
+  + Skip if your sequencing technology already produces high-quality base scores.
+  + Skip if you lack a reliable set of known variants for your population.
+    
 ---
 
 ## 8. Variant Calling
