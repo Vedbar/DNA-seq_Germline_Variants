@@ -304,7 +304,12 @@ gatk VariantFiltration -R /home/bqhs/ebola/AF086833.fa -V combined.filter1.vcf -
 
   
 ```
-gatk GenotypeConcordance -CV combined.filter2.vcf -TV /home/bqhs/ebola/ebola-samples.vcf -O SRR1972917.concordance.grp -CS SRR1972917 -TS SRR1972917
+gatk GenotypeConcordance \
+    -CV combined.filter2.vcf \
+    -TV /home/bqhs/ebola/ebola-samples.vcf \
+    -O SRR1972917.concordance.grp \
+    -CS SRR1972917 \
+    -TS SRR1972917
 ```
 
 ### When should you run Genotype Concordance?
