@@ -396,29 +396,29 @@ mkdir Class
 cd Class  
 ```
 
-### Run gatk HaplotypeCaller
+### Run GATK HaplotypeCaller
 ```
 gatk HaplotypeCaller -R /home/bqhs/hg38/genome.fa -I /home/bqhs/dna/mother.bam -O mother.g.vcf -ERC GVCF 
 gatk HaplotypeCaller -R /home/bqhs/hg38/genome.fa -I /home/bqhs/dna/father.bam -O father.g.vcf -ERC GVCF 
 gatk HaplotypeCaller -R /home/bqhs/hg38/genome.fa -I /home/bqhs/dna/son.bam    -O son.g.vcf -ERC GVCF
 ```
 
-### Run gatk CombineGVCFs
+### Run GATK CombineGVCFs
 ```
 gatk CombineGVCFs -R /home/bqhs/hg38/genome.fa -V mother.g.vcf -V father.g.vcf -V son.g.vcf -O family.g.vcf
 ```
 
-**Note: Running gatk on big files takes time. So, you can copy vcf files and proceed to downstream analysis.**
+**Note: Running GATK on big files takes time. So, you can copy vcf files and proceed to downstream analysis.**
 ```
 cp /home/bqhs/dna/Results/*vcf* ./
 ```
 
-### Run gatk GenotypeGVCFs
+### Run GATK GenotypeGVCFs
 ```
 gatk GenotypeGVCFs -R /home/bqhs/hg38/genome.fa -V family.g.vcf -O family.vcf
 ```
 
-### Run gatk Variant Filtration
+### Run GATK Variant Filtration
 ```
 gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.vcf -O family.filter.vcf -filter "QUAL < 30.0 || DP < 10" --filter-name lowQualDp 
 ```
@@ -427,7 +427,7 @@ gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.vcf -O family.filt
 grep "lowQualDp" family.filter.vcf
 ```
 
-### Run gatk Calculate Genotype Posteriors
+### Run GATK Calculate Genotype Posteriors
 + `gatk CalculateGenotypePosteriors` is used to refine genotype calls by incorporating population-level allele frequency data and Mendelian inheritance priors (if family data is available).
 + This step improves genotype accuracy by adjusting posterior probabilities of genotypes based on additional information.
 
@@ -448,7 +448,7 @@ gatk CalculateGenotypePosteriors -R /home/bqhs/hg38/genome.fa -V family.filter.v
 
 **Note: It is recommended to run CalculateGenotypePosteriors before VariantFiltration.**
 
-### Run gatk Variant Filtration
+### Run GATK Variant Filtration
 ```
 gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.CGP.vcf -O family.CGP.filter.vcf -G-filter "GQ < 20.0" -G-filter-name lowGQ 
 ```
@@ -457,7 +457,7 @@ gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.CGP.vcf -O family.
 grep "lowGQ" family.CGP.filter.vcf
 ```
 
-### Run gatk CollectVariantCallingMetrics
+### Run GATK CollectVariantCallingMetrics
 + CollectVariantCallingMetrics is a quality control (QC) tool used to assess the performance of variant calling by comparing a VCF file against a known database (e.g., dbSNP).
 + It generates variant calling statistics, helping to evaluate the accuracy and reliability of detected variants.
 
@@ -468,7 +468,7 @@ gatk CollectVariantCallingMetrics \
    -O family.CGP.filter.metrics
 ```
 
-### Run gatk GenotypeConcordance
+### Run GATK GenotypeConcordance
 + GenotypeConcordance is used to compare two VCF files and measure agreement between genotype calls.
 ```
 # gatk GenotypeConcordance -CV [your callset vcf] -TV [truth set vcf] -O [output name] -CS [sample name in your callset] -TS [sample name in truth set]
