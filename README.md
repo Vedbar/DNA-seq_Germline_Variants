@@ -420,7 +420,13 @@ gatk GenotypeGVCFs -R /home/bqhs/hg38/genome.fa -V family.g.vcf -O family.vcf
 
 ### Run GATK Variant Filtration
 ```
-gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.vcf -O family.filter.vcf -filter "QUAL < 30.0 || DP < 10" --filter-name lowQualDp 
+gatk VariantFiltration \
+    -R /home/bqhs/hg38/genome.fa \
+    -V family.vcf \
+    -O family.filter.vcf \
+    -filter "QUAL < 30.0 || DP < 10" \
+    --filter-name lowQualDp
+
 ```
 ```
 # Check the flags
