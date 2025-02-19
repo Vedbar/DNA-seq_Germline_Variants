@@ -437,7 +437,12 @@ cp /home/bqhs/dna/trio.ped ./
 ![Pedigree](Pedigree.png "Pedigree") 
 
 ```
-gatk CalculateGenotypePosteriors -R /home/bqhs/hg38/genome.fa -V family.filter.vcf -ped trio.ped -supporting /home/bqhs/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz  -O family.CGP.vcf
+gatk CalculateGenotypePosteriors \
+    -R /home/bqhs/hg38/genome.fa \
+    -V family.filter.vcf \
+    -ped trio.ped \
+    -supporting /home/bqhs/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz \
+    -O family.CGP.vcf
 ```
 
 ### Key Benefits of calculating genotype posterior 
@@ -450,7 +455,12 @@ gatk CalculateGenotypePosteriors -R /home/bqhs/hg38/genome.fa -V family.filter.v
 
 ### Run GATK Variant Filtration
 ```
-gatk VariantFiltration -R /home/bqhs/hg38/genome.fa -V family.CGP.vcf -O family.CGP.filter.vcf -G-filter "GQ < 20.0" -G-filter-name lowGQ 
+gatk VariantFiltration \
+    -R /home/bqhs/hg38/genome.fa \
+    -V family.CGP.vcf \
+    -O family.CGP.filter.vcf \
+    -G-filter "GQ < 20.0" \
+    -G-filter-name lowGQ
 ```
 ```
 # Check the flags
